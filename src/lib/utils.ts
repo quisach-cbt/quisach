@@ -10,18 +10,7 @@ export function cn(...inputs: ClassArray): string {
 	return twMerge(clsx(inputs));
 }
 
-/**
- * Pluralize a word based on the count.
- * @example
- * ```ts
- * plrl(1, 'cat') // 'cat'
- * plrl(2, 'cat') // 'cats'
- * ```
- * @param count The count to check against.
- * @param word The word to pluralize.
- * @returns The pluralized word.
- */
-export function plrl(count: number, word: string): string {
+function plrl(count: number, word: string): string {
 	return count === 1 ? word : `${word}s`;
 }
 

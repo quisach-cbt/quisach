@@ -25,4 +25,4 @@ vite.config.ts.timestamp-*
 /.vscode
 /.idea
 
-/prisma/client
+/src/lib/server/prisma
