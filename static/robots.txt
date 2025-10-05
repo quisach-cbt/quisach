@@ -1,0 +1,3 @@
+# What are you doing here, geeks?
+User-agent: Googlebot
+crawl-delay: 1

@@ -1,0 +1,1 @@
+export type supportedLanguages = "cpp" | "python" | "javascript" | "java" | "csharp" | "go" | "ruby" | "php" | "swift" | "kotlin" | "typescript";

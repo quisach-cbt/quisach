@@ -1,0 +1,551 @@
+generator client {
+    provider = "prisma-client"
+    output = "./src/lib/server/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id              String    @id @default(cuid())
+    username        String    @unique
+    displayName     String
+    email           String    @unique
+    emailVerifiedAt DateTime?
+    password        String
+    avatarUrl       String    @default("https://cdn.btoi.info.vn/default_avt.jpg")
+    isVerified      Boolean   @default(false)
+    role            Role      @default(USER)
+
+    profile                 Profile?
+    sessions                Session[]
+    accounts                Account[]
+    pinnedBadgeId           String?
+    badges                  Badge[]
+    achievements            Achievement[]
+    contributions           Contribution[]
+    submissions             Submission[]
+    solvedProblems          SolvedProblem[]
+    constestants            Contestant[]
+    posts                   Post[]
+    postReactions           PostReaction[]
+    postComments            PostComment[]
+    problemAuthors          ProblemAuthor[]
+    problemEditorials       ProblemEditorial[]
+    problemComments         ProblemComment[]
+    organizationMember      OrganizationMember[]
+    organizationInviteLink  OrganizationInviteLink[]
+    organizationJoinRequest OrganizationJoinRequest[]
+    groupMembers            GroupMember[]
+    groupJoinRequests       GroupJoinRequest[]
+    followers               UserFollow[]              @relation("Followee")
+    following               UserFollow[]              @relation("Follower")
+    reposts                 PostRepost[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum Role {
+    ADMIN
+    STAFF
+    USER
+}
+
+model Account {
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String?
+    access_token      String?
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String?
+    session_state     String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@id([provider, providerAccountId])
+}
+
+model Session {
+    sessionId String   @id
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    expiresAt DateTime
+}
+
+model Profile {
+    userId       String   @id @unique
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    gender       Gender?
+    bio          String?
+    pronouns     String?
+    location     String?
+    website      String?
+    githubUrl    String?
+    theme        String?
+    aboutMe      String?
+    point        Int      @default(0)
+    rankedScore  Int      @default(0)
+    storageUsage Int      @default(0) // In binary standard KB.
+    storageLimit Int      @default(5242880) // 5242880 KB = 5GB
+    updatedAt    DateTime @updatedAt
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    PREFER_NOT_TO_SAY
+}
+
+model UserFollow {
+    followerId String
+    followeeId String
+
+    follower User @relation("Follower", fields: [followerId], references: [id])
+    followee User @relation("Followee", fields: [followeeId], references: [id])
+
+    @@unique([followerId, followeeId])
+}
+
+model Contribution {
+    id            String            @id @default(cuid())
+    user          User              @relation(fields: [userId], references: [id])
+    userId        String
+    type          ContributionType?
+    contributedTo String?
+    createdAt     DateTime          @default(now())
+    updatedAt     DateTime          @updatedAt
+}
+
+enum ContributionType {
+    CONTEST
+    PROBLEM
+    EDITORIAL
+}
+
+model Badge {
+    id          String   @id @default(cuid())
+    userId      String
+    user        User     @relation(fields: [userId], references: [id])
+    name        String?
+    description String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model Achievement {
+    id          String   @id @default(cuid())
+    users       User[]
+    iconUrl     String
+    color       String
+    name        String
+    description String
+    createdAt   DateTime @default(now())
+}
+
+model Contest {
+    id            String         @id @default(cuid())
+    name          String
+    startDate     DateTime
+    endDate       DateTime
+    format        String?
+    type          String?
+    visibility    String?
+    contestDetail ContestDetail?
+    contestants   Contestant[]
+    problems      Problem[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum ContestVisibility {
+    UNPUBLIHSED
+    PUBLISHED
+    PUBLIC
+    PRIVATE
+    RESTRICTED
+}
+
+model Contestant {
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String
+    contest   Contest  @relation(fields: [contestId], references: [id])
+    contestId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([userId, contestId])
+}
+
+model ContestDetail {
+    contestId   String   @id @unique
+    contest     Contest  @relation(fields: [contestId], references: [id])
+    description String?
+    rules       String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model Problem {
+    id               String             @id @default(cuid())
+    problemDetail    ProblemDetail?
+    name             String
+    description      String
+    visibility       ProblemVisibility  @default(UNPUBLISHED)
+    point            Int                @default(0)
+    solvedProblems   SolvedProblem[]
+    submissions      Submission[]
+    authors          ProblemAuthor[]
+    problemEditorial ProblemEditorial[]
+    problemComment   ProblemComment[]
+    categoryId       String?
+    category         ProblemCategory?   @relation(fields: [categoryId], references: [id])
+    organizationId   String?
+    organization     Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    contestId        String?
+    contest          Contest?           @relation(fields: [contestId], references: [id])
+    createdAt        DateTime           @default(now())
+    updatedAt        DateTime           @updatedAt
+}
+
+enum ProblemVisibility {
+    UNPUBLISHED
+    PUBLISHED
+    PRIVATE
+    PUBLIC
+}
+
+model ProblemDetail {
+    problemId              String                  @id @unique
+    problem                Problem                 @relation(fields: [problemId], references: [id], onDelete: Cascade)
+    statement              String
+    inputFormat            String
+    outputFormat           String
+    constraints            String?
+    notes                  String?
+    sampleTestCases        ProblemSampleTestCase[]
+    input                  String                  @default("stdin")
+    output                 String                  @default("stdout")
+    timelimit              Int                     @default(1000)
+    memorylimit            Int                     @default(262144)
+    problemAllowedLanguage AllowedLanguage[]       @default([CPP])
+}
+
+model ProblemSampleTestCase {
+    id          Int           @id @default(autoincrement())
+    problemId   String
+    problem     ProblemDetail @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
+    input       String
+    output      String
+    explanation String?
+}
+
+model Submission {
+    id        Int             @id @default(autoincrement())
+    userId    String
+    user      User            @relation(fields: [userId], references: [id])
+    problemId String
+    problem   Problem         @relation(fields: [problemId], references: [id])
+    source    String
+    language  AllowedLanguage
+    judgeId   String?
+    memory    Int?
+    score     Int?
+    time      Int?
+    verdict   String?
+    status    Json?
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+}
+
+enum AllowedLanguage {
+    CPP
+    PY
+    PAS
+}
+
+model SolvedProblem {
+    id        String  @id @default(cuid())
+    userId    String?
+    problemId String?
+
+    user    User?    @relation(fields: [userId], references: [id])
+    problem Problem? @relation(fields: [problemId], references: [id])
+}
+
+model ProblemAuthor {
+    id        String  @id @default(cuid())
+    role      String?
+    problemId String?
+    userId    String?
+
+    problem Problem? @relation(fields: [problemId], references: [id])
+    user    User?    @relation(fields: [userId], references: [id])
+}
+
+model ProblemCategory {
+    id          String   @id @default(cuid())
+    name        String?
+    description String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    problems Problem[]
+}
+
+model ProblemEditorial {
+    id            String           @id @default(cuid())
+    name          String?
+    content       String?
+    createdAt     DateTime         @default(now())
+    updatedAt     DateTime         @updatedAt
+    problemId     String?
+    authorId      String?
+    status        EditorialStatus? @default(PENDING)
+    problemDetail Problem?         @relation(fields: [problemId], references: [id])
+    author        User?            @relation(fields: [authorId], references: [id])
+}
+
+enum EditorialStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+model ProblemComment {
+    id            String   @id @default(cuid())
+    content       String?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    authorId      String?
+    problemId     String?
+    problemDetail Problem? @relation(fields: [problemId], references: [id])
+    author        User?    @relation(fields: [authorId], references: [id])
+}
+
+model Post {
+    id             String  @id @default(cuid())
+    title          String
+    content        String
+    pinned         Boolean @default(false)
+    authorId       String
+    organizationId String?
+    groupId        String?
+
+    author       User           @relation(fields: [authorId], references: [id])
+    visibility   PostVisibility @default(UNPUBLISHED)
+    organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    group        Group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    reactions    PostReaction[]
+    comments     PostComment[]
+    tags         PostTag[]
+    reposts      PostRepost[]
+
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+}
+
+enum PostVisibility {
+    UNPUBLISHED
+    PUBLISHED
+    PRIVATE
+    PUBLIC
+}
+
+model PostReaction {
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    postId    String
+    post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([userId, postId])
+}
+
+model PostTag {
+    id          String  @id @default(cuid())
+    name        String?
+    description String?
+    postId      String?
+    posts       Post[]
+    bgcolor     String?
+    textcolor   String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+}
+
+model PostComment {
+    id        String   @id @default(cuid())
+    authorId  String
+    postId    String
+    content   String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    Post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostRepost {
+    id     String @id @default(cuid())
+    userId String
+    postId String
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([userId, postId])
+    @@index([userId, postId])
+}
+
+model Organization {
+    id                      String                    @id
+    name                    String
+    description             String?
+    logoUrl                 String
+    bannerUrl               String
+    website                 String?
+    isVerified              Boolean                   @default(false)
+    storageUsage            Int                       @default(0) // In binary standard KB.
+    storageLimit            Int                       @default(5242880) // 5242880 KB = 5GB
+    OrganizationMember      OrganizationMember[]
+    Problem                 Problem[]
+    Post                    Post[]
+    OrganizationJoinRequest OrganizationJoinRequest[]
+    OrganizationInviteLink  OrganizationInviteLink[]
+    createdAt               DateTime                  @default(now())
+    updatedAt               DateTime                  @updatedAt
+}
+
+model OrganizationMember {
+    id             String           @id @default(cuid())
+    userId         String
+    user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    organizationId String
+    organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    role           OrganizationRole @default(MEMBER)
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+
+    @@unique([userId, organizationId])
+    @@index([organizationId])
+}
+
+enum OrganizationRole {
+    ADMIN
+    STAFF
+    MEMBER
+}
+
+model OrganizationJoinRequest {
+    id             String                        @id @default(cuid())
+    userId         String
+    user           User                          @relation(fields: [userId], references: [id])
+    organizationId String
+    organization   Organization                  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    status         OrganizationJoinRequestStatus @default(PENDING)
+    createdAt      DateTime                      @default(now())
+
+    @@unique([userId, organizationId])
+    @@index([organizationId])
+}
+
+model OrganizationInviteLink {
+    id             String       @id @default(cuid())
+    userId         String
+    user           User         @relation(fields: [userId], references: [id])
+    organizationId String
+    organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    joinAmount     Int          @default(0)
+    createdAt      DateTime     @default(now())
+    expiredAt      DateTime     @default(dbgenerated("now() + interval '1 day'"))
+
+    @@index([organizationId])
+}
+
+enum OrganizationJoinRequestStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+model Group {
+    id                String  @id
+    name              String
+    description       String?
+    logoUrl           String
+    bannerUrl         String
+    website           String?
+    isVerified        Boolean @default(false)
+    isPro             Boolean @default(false)
+    isPrivate         Boolean @default(false)
+    isRestricted      Boolean @default(false)
+    isRequireApproval Boolean @default(false)
+
+    members      GroupMember[]
+    posts        Post[]
+    joinRequests GroupJoinRequest[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model GroupMember {
+    id         String @id
+    userId     String
+    groupId    String
+    referCount Int    @default(0)
+    referCode  String @default(cuid())
+
+    user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    group Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    role  GroupRole @default(MEMBER)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([userId, groupId])
+    @@index([groupId])
+}
+
+enum GroupRole {
+    ADMIN
+    MEMBER
+}
+
+model GroupJoinRequest {
+    id      String                 @id
+    userId  String
+    groupId String
+    status  GroupJoinRequestStatus @default(PENDING)
+
+    user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([groupId])
+}
+
+enum GroupJoinRequestStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
