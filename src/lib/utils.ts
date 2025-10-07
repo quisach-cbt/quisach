@@ -25,7 +25,7 @@ function plrl(count: number, word: string): string {
  * @returns The relative time string.
  */
 export function getRelativeTime(date: Date): string {
-	const diff = new Date().getTime() - date.getTime();
+	const diff = Date.now() - date.getTime();
 	for (const { label, value } of [
 		{ label: 'year', value: 1000 * 60 * 60 * 24 * 365 },
 		{ label: 'month', value: 1000 * 60 * 60 * 24 * 30 },

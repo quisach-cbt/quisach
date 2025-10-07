@@ -1,5 +1,5 @@
-import GitHubLogo from './github/logo.svelte';
-import FacebookLogo from './facebook/logo.svelte';
-import DiscordLogo from './discord/logo.svelte';
+import GitHub from './github.svelte';
+import Facebook from './facebook.svelte';
+import Discord from './discord.svelte';
 
-export { GitHubLogo, FacebookLogo, DiscordLogo };
+export { GitHub, Facebook, Discord };

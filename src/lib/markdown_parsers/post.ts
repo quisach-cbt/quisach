@@ -1,4 +1,4 @@
-import DOMPurity from 'dompurify';
+import DOMPurity from 'isomorphic-dompurify';
 import { marked } from 'marked';
 import markedKatex from 'marked-katex-extension';
 

@@ -1,5 +1,4 @@
-/* eslint-disable no-var */
-import type { PrismaClient, User, Session } from '@prisma/client';
+import type { PrismaClient, User, Session } from './lib/server/prisma/client';
 
 declare global {
 	namespace App {

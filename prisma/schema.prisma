@@ -1,6 +1,6 @@
 generator client {
     provider = "prisma-client"
-    output = "../src/lib/server/prisma"
+    output   = "../src/lib/server/prisma"
 }
 
 datasource db {
@@ -15,17 +15,18 @@ model User {
     email           String    @unique
     emailVerifiedAt DateTime?
     password        String
-    avatarUrl       String    @default("https://cdn.btoi.info.vn/default_avt.jpg")
-    isVerified      Boolean   @default(false)
+    avatarUrl       String    @default("")
     role            Role      @default(USER)
+    points          Int       @default(0)
+    isBanned        Boolean   @default(false)
+    banReason       String?
 
-    profile                 Profile?
-    sessions                Session[]
-    accounts                Account[]
-    pinnedBadgeId           String?
+    profile  Profile?
+    sessions Session[]
+    accounts Account[]
+
     badges                  Badge[]
     achievements            Achievement[]
-    contributions           Contribution[]
     submissions             Submission[]
     solvedProblems          SolvedProblem[]
     constestants            Contestant[]
@@ -38,8 +39,6 @@ model User {
     organizationMember      OrganizationMember[]
     organizationInviteLink  OrganizationInviteLink[]
     organizationJoinRequest OrganizationJoinRequest[]
-    groupMembers            GroupMember[]
-    groupJoinRequests       GroupJoinRequest[]
     followers               UserFollow[]              @relation("Followee")
     following               UserFollow[]              @relation("Follower")
     reposts                 PostRepost[]
@@ -59,13 +58,13 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?
-    access_token      String?
-    expires_at        Int?
-    token_type        String?
+    refreshToken      String?
+    accessToken       String?
+    expiresAt         Int?
+    tokenType         String?
     scope             String?
-    id_token          String?
-    session_state     String?
+    idToken           String?
+    sessionState      String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -94,9 +93,6 @@ model Profile {
     theme        String?
     aboutMe      String?
     point        Int      @default(0)
-    rankedScore  Int      @default(0)
-    storageUsage Int      @default(0) // In binary standard KB.
-    storageLimit Int      @default(5242880) // 5242880 KB = 5GB
     updatedAt    DateTime @updatedAt
 }
 
@@ -114,22 +110,6 @@ model UserFollow {
     followee User @relation("Followee", fields: [followeeId], references: [id])
 
     @@unique([followerId, followeeId])
-}
-
-model Contribution {
-    id            String            @id @default(cuid())
-    user          User              @relation(fields: [userId], references: [id])
-    userId        String
-    type          ContributionType?
-    contributedTo String?
-    createdAt     DateTime          @default(now())
-    updatedAt     DateTime          @updatedAt
-}
-
-enum ContributionType {
-    CONTEST
-    PROBLEM
-    EDITORIAL
 }
 
 model Badge {
@@ -169,7 +149,7 @@ model Contest {
 }
 
 enum ContestVisibility {
-    UNPUBLIHSED
+    UNPUBLISHED
     PUBLISHED
     PUBLIC
     PRIVATE
@@ -345,7 +325,6 @@ model Post {
     author       User           @relation(fields: [authorId], references: [id])
     visibility   PostVisibility @default(UNPUBLISHED)
     organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    group        Group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
     reactions    PostReaction[]
     comments     PostComment[]
     tags         PostTag[]
@@ -483,69 +462,3 @@ enum OrganizationJoinRequestStatus {
     ACCEPTED
     REJECTED
 }
-
-model Group {
-    id                String  @id
-    name              String
-    description       String?
-    logoUrl           String
-    bannerUrl         String
-    website           String?
-    isVerified        Boolean @default(false)
-    isPro             Boolean @default(false)
-    isPrivate         Boolean @default(false)
-    isRestricted      Boolean @default(false)
-    isRequireApproval Boolean @default(false)
-
-    members      GroupMember[]
-    posts        Post[]
-    joinRequests GroupJoinRequest[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-model GroupMember {
-    id         String @id
-    userId     String
-    groupId    String
-    referCount Int    @default(0)
-    referCode  String @default(cuid())
-
-    user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    group Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
-    role  GroupRole @default(MEMBER)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@unique([userId, groupId])
-    @@index([groupId])
-}
-
-enum GroupRole {
-    ADMIN
-    MEMBER
-}
-
-model GroupJoinRequest {
-    id      String                 @id
-    userId  String
-    groupId String
-    status  GroupJoinRequestStatus @default(PENDING)
-
-    user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@index([groupId])
-}
-
-enum GroupJoinRequestStatus {
-    PENDING
-    ACCEPTED
-    REJECTED
-}
-

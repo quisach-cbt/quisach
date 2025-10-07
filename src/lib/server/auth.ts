@@ -1,5 +1,5 @@
 import { prisma } from './prisma';
-import type { User, Session } from '@prisma/client';
+import type { User, Session } from '$prisma/client';
 import type { RequestEvent } from "@sveltejs/kit";
 import { v4 as uuidv4 } from 'uuid';
 import { encodeHexLowerCase } from '@oslojs/encoding';

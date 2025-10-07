@@ -1,4 +1,6 @@
-import type { Handle, HandleFetch } from '@sveltejs/kit';
+import type { Handle, HandleFetch, ServerInit } from '@sveltejs/kit';
+import dotenv from 'dotenv';
+import 'dotenv/config';
 import { validateSessionToken, setSessionTokenCookie, deleteSessionTokenCookie } from './lib/server/auth';
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -32,4 +34,9 @@ export const handleFetch: HandleFetch = async ({ request, fetch }) => {
     }
 
 	return fetch(request);
+};
+
+export const init: ServerInit = () => {
+    dotenv.config();
+    console.log('Environment variables loaded');
 };

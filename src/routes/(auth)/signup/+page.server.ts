@@ -2,25 +2,25 @@ import { prisma } from '$lib/server/prisma';
 import { hash } from 'bcryptjs';
 import type { Actions } from './$types';
 import { createSession, generateSessionToken, setSessionTokenCookie } from '$lib/server/auth';
-import { fail, redirect } from '@sveltejs/kit';
-import { object, string } from 'zod';
+import { fail } from '@sveltejs/kit';
+// import { object, string } from 'zod';
 
-const signUpSchema = object({
-	email: string({ required_error: 'Email cannot be blank' }).email('Invalid email'),
-	username: string({ required_error: 'Username cannot be blank' })
-		.regex(/^[a-zA-Z0-9_]+$/, {
-			message: 'Invalid username'
-		})
-		.min(3, { message: 'Minimum of 3 characters' })
-		.max(32, { message: 'Maximum of 32 characters' }),
-	password: string({ required_error: 'Password is required' })
-		.min(8, 'Password must be more than 8 characters')
-		.regex(/^(?=.*[a-z])(?=.*\d).{8,}$/, { message: 'Invalid password' }),
-	confirmPassword: string({ required_error: 'Comfirm your password' })
-}).refine((data) => data.password === data.confirmPassword, {
-	message: 'Password is not match',
-	path: ['confirmPassword']
-});
+// const signUpSchema = object({
+// 	email: string({ required_error: 'Email cannot be blank' }).email('Invalid email'),
+// 	username: string({ required_error: 'Username cannot be blank' })
+// 		.regex(/^[a-zA-Z0-9_]+$/, {
+// 			message: 'Invalid username'
+// 		})
+// 		.min(3, { message: 'Minimum of 3 characters' })
+// 		.max(32, { message: 'Maximum of 32 characters' }),
+// 	password: string({ required_error: 'Password is required' })
+// 		.min(8, 'Password must be more than 8 characters')
+// 		.regex(/^(?=.*[a-z])(?=.*\d).{8,}$/, { message: 'Invalid password' }),
+// 	confirmPassword: string({ required_error: 'Comfirm your password' })
+// }).refine((data) => data.password === data.confirmPassword, {
+// 	message: 'Password is not match',
+// 	path: ['confirmPassword']
+// });
 
 export const actions = {
     default: async (event) => {

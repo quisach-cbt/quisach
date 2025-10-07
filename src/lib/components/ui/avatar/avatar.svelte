@@ -11,11 +11,11 @@
 		[prop: string]: unknown;
 	};
 
-	let { class: className, src = DEFAULT_AVATAR_URL, href: hRef, size = 'default', alt = 'Default avatar', ...rest }: Props = $props();
+	let { class: className, src, href: hRef, size = 'default', alt = 'Default avatar', ...rest }: Props = $props();
 </script>
 
 {#snippet avatar()}
-	<img class={cn(avatarVariants({ size, className }))} {src} {alt} {...rest}>
+	<img class={cn(avatarVariants({ size, className }))} src={src || DEFAULT_AVATAR_URL} {alt} {...rest}>
 {/snippet}
 
 {#if hRef}

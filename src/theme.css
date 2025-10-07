@@ -1,0 +1,39 @@
+@theme inline {
+    --text-h1: 3.5rem;
+	--text-h2: 3rem;
+	--text-h3: 2.5rem;
+	--text-h4: 2rem;
+	--text-h5: 1.5rem;
+	--text-h6: 1.3rem;
+	--text-lg: 1.25rem;
+	--text-md: 1.125rem;
+	--text-nm: 1rem;
+	--text-sm: 0.875rem;	
+	--text-xs: 0.75rem;
+	--text-xxs: 0.625rem;
+
+	--breakpoint-3xl: 112rem;
+ 
+	--font-heading: "Lexend", "sans-serif";
+	--font-sans: "Montserrat", "sans-serif";
+	--font-mono: "JetBrains Mono", "monospace";
+}
+
+@layer base { 
+	html {
+		-webkit-text-size-adjust: 100%;
+		font-variation-settings: normal;
+		scrollbar-color: var(--bg-muted);
+	}
+ 
+	body {
+		font-feature-settings:
+			"rlig" 1,
+			"calt" 1;
+	}
+ 
+	::selection {
+		background: #fdffa4;
+		color: black;
+	}
+}

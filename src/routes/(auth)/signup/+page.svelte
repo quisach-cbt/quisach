@@ -119,7 +119,7 @@
             </div>
             {/if}
             
-            <form method="POST" class="space-y-4" onsubmit={handleSubmit} use:enhance>
+            <form method="POST" class="space-y-4" use:enhance>
                 <!-- Email -->
                 <div class="space-y-1">
                     <label for="email" class="block text-sm font-medium text-gray-700">
@@ -129,7 +129,7 @@
                       name="email"
                       type="email"
                       bind:value={email}
-                      placeholder="btoi.account@btoi.info.vn"
+                      placeholder="example@email.com"
                     />
                 </div>
                 

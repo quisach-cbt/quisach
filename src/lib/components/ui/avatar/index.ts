@@ -10,7 +10,8 @@ const avatarVariants = tv({
             lg: 'size-12',
             xl: 'size-14',
             xxl: 'size-20',
-            huge: 'size-32'
+            huge: 'size-32',
+            giant: 'size-48'
         }
     },
     defaultVariants: {

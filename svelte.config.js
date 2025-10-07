@@ -9,6 +9,9 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
+		alias: {
+			'$prisma': 'src/lib/server/prisma'
+		}
 	}
 };
 
