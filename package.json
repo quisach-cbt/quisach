@@ -14,7 +14,7 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
-		"postinstall": "prisma generate"
+		"postinstall": "pnpm prisma generate"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.8",
