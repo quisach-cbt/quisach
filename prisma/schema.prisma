@@ -27,15 +27,10 @@ model User {
 
     badges                  Badge[]
     achievements            Achievement[]
-    submissions             Submission[]
-    solvedProblems          SolvedProblem[]
     constestants            Contestant[]
     posts                   Post[]
     postReactions           PostReaction[]
     postComments            PostComment[]
-    problemAuthors          ProblemAuthor[]
-    problemEditorials       ProblemEditorial[]
-    problemComments         ProblemComment[]
     organizationMember      OrganizationMember[]
     organizationInviteLink  OrganizationInviteLink[]
     organizationJoinRequest OrganizationJoinRequest[]
@@ -45,6 +40,16 @@ model User {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    books Book[] @relation("UserBooks")
+
+    listings Listing[]
+
+    Location Location[]
+
+    Review Review[] @relation("ReviewedUser")
+
+    Reviews Review[]
 }
 
 enum Role {
@@ -55,6 +60,7 @@ enum Role {
 
 model Account {
     userId            String
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     type              String
     provider          String
     providerAccountId String
@@ -69,8 +75,6 @@ model Account {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
     @@id([provider, providerAccountId])
 }
 
@@ -82,18 +86,17 @@ model Session {
 }
 
 model Profile {
-    userId       String   @id @unique
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    gender       Gender?
-    bio          String?
-    pronouns     String?
-    location     String?
-    website      String?
-    githubUrl    String?
-    theme        String?
-    aboutMe      String?
-    point        Int      @default(0)
-    updatedAt    DateTime @updatedAt
+    userId    String   @id @unique
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    gender    Gender?
+    bio       String?
+    pronouns  String?
+    location  String?
+    website   String?
+    theme     String?
+    aboutMe   String?
+    point     Int      @default(0)
+    updatedAt DateTime @updatedAt
 }
 
 enum Gender {
@@ -142,7 +145,6 @@ model Contest {
     visibility    String?
     contestDetail ContestDetail?
     contestants   Contestant[]
-    problems      Problem[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -174,143 +176,6 @@ model ContestDetail {
     rules       String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
-}
-
-model Problem {
-    id               String             @id @default(cuid())
-    problemDetail    ProblemDetail?
-    name             String
-    description      String
-    visibility       ProblemVisibility  @default(UNPUBLISHED)
-    point            Int                @default(0)
-    solvedProblems   SolvedProblem[]
-    submissions      Submission[]
-    authors          ProblemAuthor[]
-    problemEditorial ProblemEditorial[]
-    problemComment   ProblemComment[]
-    categoryId       String?
-    category         ProblemCategory?   @relation(fields: [categoryId], references: [id])
-    organizationId   String?
-    organization     Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    contestId        String?
-    contest          Contest?           @relation(fields: [contestId], references: [id])
-    createdAt        DateTime           @default(now())
-    updatedAt        DateTime           @updatedAt
-}
-
-enum ProblemVisibility {
-    UNPUBLISHED
-    PUBLISHED
-    PRIVATE
-    PUBLIC
-}
-
-model ProblemDetail {
-    problemId              String                  @id @unique
-    problem                Problem                 @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    statement              String
-    inputFormat            String
-    outputFormat           String
-    constraints            String?
-    notes                  String?
-    sampleTestCases        ProblemSampleTestCase[]
-    input                  String                  @default("stdin")
-    output                 String                  @default("stdout")
-    timelimit              Int                     @default(1000)
-    memorylimit            Int                     @default(262144)
-    problemAllowedLanguage AllowedLanguage[]       @default([CPP])
-}
-
-model ProblemSampleTestCase {
-    id          Int           @id @default(autoincrement())
-    problemId   String
-    problem     ProblemDetail @relation(fields: [problemId], references: [problemId], onDelete: Cascade)
-    input       String
-    output      String
-    explanation String?
-}
-
-model Submission {
-    id        Int             @id @default(autoincrement())
-    userId    String
-    user      User            @relation(fields: [userId], references: [id])
-    problemId String
-    problem   Problem         @relation(fields: [problemId], references: [id])
-    source    String
-    language  AllowedLanguage
-    judgeId   String?
-    memory    Int?
-    score     Int?
-    time      Int?
-    verdict   String?
-    status    Json?
-    createdAt DateTime        @default(now())
-    updatedAt DateTime        @updatedAt
-}
-
-enum AllowedLanguage {
-    CPP
-    PY
-    PAS
-}
-
-model SolvedProblem {
-    id        String  @id @default(cuid())
-    userId    String?
-    problemId String?
-
-    user    User?    @relation(fields: [userId], references: [id])
-    problem Problem? @relation(fields: [problemId], references: [id])
-}
-
-model ProblemAuthor {
-    id        String  @id @default(cuid())
-    role      String?
-    problemId String?
-    userId    String?
-
-    problem Problem? @relation(fields: [problemId], references: [id])
-    user    User?    @relation(fields: [userId], references: [id])
-}
-
-model ProblemCategory {
-    id          String   @id @default(cuid())
-    name        String?
-    description String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    problems Problem[]
-}
-
-model ProblemEditorial {
-    id            String           @id @default(cuid())
-    name          String?
-    content       String?
-    createdAt     DateTime         @default(now())
-    updatedAt     DateTime         @updatedAt
-    problemId     String?
-    authorId      String?
-    status        EditorialStatus? @default(PENDING)
-    problemDetail Problem?         @relation(fields: [problemId], references: [id])
-    author        User?            @relation(fields: [authorId], references: [id])
-}
-
-enum EditorialStatus {
-    PENDING
-    APPROVED
-    REJECTED
-}
-
-model ProblemComment {
-    id            String   @id @default(cuid())
-    content       String?
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
-    authorId      String?
-    problemId     String?
-    problemDetail Problem? @relation(fields: [problemId], references: [id])
-    author        User?    @relation(fields: [authorId], references: [id])
 }
 
 model Post {
@@ -403,7 +268,6 @@ model Organization {
     storageUsage            Int                       @default(0) // In binary standard KB.
     storageLimit            Int                       @default(5242880) // 5242880 KB = 5GB
     OrganizationMember      OrganizationMember[]
-    Problem                 Problem[]
     Post                    Post[]
     OrganizationJoinRequest OrganizationJoinRequest[]
     OrganizationInviteLink  OrganizationInviteLink[]
@@ -461,4 +325,61 @@ enum OrganizationJoinRequestStatus {
     PENDING
     ACCEPTED
     REJECTED
+}
+
+model Book {
+    id          String    @id @default(cuid())
+    title       String
+    author      String
+    isbn        String?   @unique
+    publishedAt DateTime?
+    description String?
+    coverUrl    String?
+
+    ownerId  String
+    owner    User      @relation("UserBooks", fields: [ownerId], references: [id])
+    listings Listing[]
+}
+
+model Listing {
+    id        String        @id @default(cuid())
+    status    ListingStatus @default(ACTIVE)
+    createdAt DateTime      @default(now())
+
+    // Relations
+    bookId String
+    book   Book   @relation(fields: [bookId], references: [id])
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+}
+
+model Review {
+    id        String   @id @default(cuid())
+    rating    Int // 1-5
+    comment   String?
+    createdAt DateTime @default(now())
+
+    // Relations
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    targetUserId String
+    targetUser   User   @relation("ReviewedUser", fields: [targetUserId], references: [id])
+}
+
+model Location {
+    id      String @id @default(cuid())
+    city    String
+    country String
+    lat     Float?
+    lng     Float?
+
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id])
+}
+
+enum ListingStatus {
+    ACTIVE
+    INACTIVE
+    TRADED
 }

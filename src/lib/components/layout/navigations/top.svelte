@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Dropdown } from '$lib/components/ui/dropdown';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { ChevronDown, Coins, Search } from '@lucide/svelte';
+	import { ChevronDown, Coins, Search, BookPlus } from '@lucide/svelte';
 	import { Avatar } from '$lib/components/ui/avatar';
 	import { page } from '$app/state';
 	import { cn } from '$lib/utils';
@@ -140,9 +140,17 @@
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
+
+			<Button
+				href="/books/add"
+				class="hidden items-center md:flex"
+			>
+				<BookPlus size={16} />
+				<span class="font-medium">Thêm sách</span>
+			</Button>
 		{:else}
 			<div class="hidden items-center gap-4 md:flex">
-				<Button variant="outline" href="/signin">Đăng nhập</Button>
+				<Button variant="outline" href="/login">Đăng nhập</Button>
 				<Button href="/signup">Đăng ký</Button>
 			</div>
 		{/if}

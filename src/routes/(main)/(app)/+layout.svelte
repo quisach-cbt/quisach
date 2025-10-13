@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LeftNavigation } from "$lib/components/layout/navigations";
+	import { LeftNavigation } from '$lib/components/layout/navigations';
 
 	let { children } = $props();
 </script>

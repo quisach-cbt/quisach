@@ -1,14 +1,15 @@
 import { clsx, type ClassArray } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-/**
- * Utility function to merge class names using clsx and tailwind-merge.
- * @param inputs The class names to merge.
- * @returns Merged class names.
- */
 export function cn(...inputs: ClassArray): string {
 	return twMerge(clsx(inputs));
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, "children"> : T;
+export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
+export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
 function plrl(count: number, word: string): string {
 	return count === 1 ? word : `${word}s`;

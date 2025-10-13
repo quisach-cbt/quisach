@@ -129,7 +129,7 @@
 				</Head6>
 				<ul class="space-y-2 text-sm text-slate-600">
 					{#each links as { icon: Icon, label, href }}
-						<li class="group transition-colors hover:text-black fill-muted">
+						<li class="group transition-colors hover:text-black fill-current">
 							<a
 								{href}
 								target={href.startsWith('http') ? '_blank' : '_self'}

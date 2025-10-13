@@ -1,8 +1,8 @@
 <script lang="ts">
-	import SignUpForm from './signup.svelte';
+	import LoginForm from './login.svelte';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
 </script>
 
-<SignUpForm {form} />
+<LoginForm {form} />

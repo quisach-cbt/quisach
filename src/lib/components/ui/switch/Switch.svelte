@@ -1,58 +1,29 @@
-<script lang='ts'>
-  import { cn } from '$lib/utils';
-  import { switchVariants, thumbVariants, type SwitchVariants } from '.';
+<script lang="ts">
+	import { Switch as SwitchPrimitive } from "bits-ui";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
 
-  type Props =  {
-    value?: boolean,
-    label?: string,
-  } & SwitchVariants;
-
-  let { value = $bindable(false), label = '', variant = 'default', size = 'md', disabled = false, }: Props = $props();
-
-  let switchClasses = $derived(cn(
-    'sr-only peer',
-    switchVariants({ variant, size, disabled })
-  ));
-  let thumbContainerClasses = $derived(cn(
-    'relative inline-flex items-center h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-    'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
-    'peer-checked:bg-primary',
-    'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2',
-    'data-[state=unchecked]:bg-input'
-  ));
-  let thumbClasses = $derived(cn(
-    thumbVariants({ size }),
-    'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform',
-    'data-[state=unchecked]:translate-x-0',
-    'data-[state=checked]:translate-x-5'
-  ));
+	let {
+		ref = $bindable(null),
+		class: className,
+		checked = $bindable(false),
+		...restProps
+	}: WithoutChildrenOrChild<SwitchPrimitive.RootProps> = $props();
 </script>
 
-<label
-  class={cn(
-    'inline-flex items-center gap-2',
-    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-  )}
+<SwitchPrimitive.Root
+	bind:ref
+	bind:checked
+	data-slot="switch"
+	class={cn(
+		"data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 shadow-xs peer inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent outline-none transition-all focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+		className
+	)}
+	{...restProps}
 >
-	<input
-		type="checkbox"
-		role="switch"
-		aria-label="Switch"
-		class={cn(switchClasses, 'hidden')}
-		bind:checked={value}
-		{disabled}
+	<SwitchPrimitive.Thumb
+		data-slot="switch-thumb"
+		class={cn(
+			"bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0"
+		)}
 	/>
-	<span
-		class={thumbContainerClasses}
-		aria-hidden="true"
-		data-state={value ? 'checked' : 'unchecked'}
-	>
-		<span
-		class={thumbClasses}
-		data-state={value ? 'checked' : 'unchecked'}
-		></span>
-	</span>
-	{#if label}
-		<span class="text-sm font-medium">{label}</span>
-	{/if}
-</label>
+</SwitchPrimitive.Root>
