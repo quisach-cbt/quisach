@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "pnpm prisma generate && vite dev",
 		"build": "pnpm prisma generate && vite build",
+		"postinstall": "pnpm prisma generate",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
