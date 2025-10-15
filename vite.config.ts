@@ -41,6 +41,7 @@ export default defineConfig({
 		rollupOptions: {
 			external: [
 				'@prisma/client/runtime',
+				'@prisma/client/runtime/query_engine_bg.postgresql.wasm-base64.js'
 			]
 		}
 	}
