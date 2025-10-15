@@ -35,7 +35,7 @@ export default defineConfig({
 		exclude: ['svelte-codemirror-editor', 'codemirror', '@codemirror/lang-cpp']
 	},
 	ssr: {
-		noExternal: ['@prisma/client', 'prisma']
+		noExternal: ['@prisma/client']
 	}
 }); // ssr: {
 // 	noExternal: ['monaco-editor']
