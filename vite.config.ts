@@ -36,6 +36,13 @@ export default defineConfig({
 	},
 	ssr: {
 		noExternal: ['@prisma/client']
+	},
+	build: {
+		rollupOptions: {
+			external: [
+				'@prisma/client/runtime',
+			]
+		}
 	}
 }); // ssr: {
 // 	noExternal: ['monaco-editor']
