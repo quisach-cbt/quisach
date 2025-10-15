@@ -35,16 +35,8 @@ export default defineConfig({
 		exclude: ['svelte-codemirror-editor', 'codemirror', '@codemirror/lang-cpp']
 	},
 	ssr: {
-		noExternal: ['@prisma/client']
+		noExternal: ['@prisma/client', 'prisma']
 	},
-	build: {
-		rollupOptions: {
-			external: [
-				'@prisma/client/runtime',
-				'@prisma/client/runtime/query_engine_bg.postgresql.wasm-base64.js'
-			]
-		}
-	}
 }); // ssr: {
 // 	noExternal: ['monaco-editor']
 // }
