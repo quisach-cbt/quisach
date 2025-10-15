@@ -1,8 +1,12 @@
 import { prisma } from '$prisma';
+import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-	const results = await prisma.book.findMany({
+export const load: PageServerLoad = async ({params}) => {
+    const book = await prisma.book.findFirst({
+        where: {
+            id: params.book_id
+        },
         include: {
             owner: {
                 select: {
@@ -12,7 +16,8 @@ export const load: PageServerLoad = async () => {
             }
         }
     });
-	return {
-		results
-	};
+    if (!book) error(404)
+    return {
+        book
+    };
 };
